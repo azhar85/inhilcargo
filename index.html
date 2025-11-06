@@ -163,11 +163,16 @@
         .result-final {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 22px 20px;
+            padding: 25px 20px;
             border-radius: 14px;
             margin-top: 20px;
             border: none;
             box-shadow: 0 10px 25px rgba(102, 126, 234, 0.5);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
         .result-final .result-label {
@@ -175,16 +180,17 @@
             font-size: 15px;
             font-weight: 600;
             letter-spacing: 0.2px;
-            line-height: 1.5;
+            margin-bottom: 10px;
+            display: block;
         }
 
         .result-final .result-value {
             color: #ffffff;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: 800;
             letter-spacing: -0.5px;
-            line-height: 1.2;
             text-shadow: 0 3px 6px rgba(0, 0, 0, 0.25);
+            display: block;
         }
 
         .currency {
@@ -286,13 +292,17 @@
                 <span class="result-label">Potongan Admin (20%):</span>
                 <span class="result-value" id="displayPotongan">Rp 0</span>
             </div>
-            <div class="result-item result-final">
-                <span class="result-label">Yang Diterima Supir:</span>
-                <span class="result-value" id="displayDiterimaSupir">Rp 0</span>
+            <div class="result-final">
+                <div class="result-label">Yang Diterima Supir:</div>
+                <div class="result-value" id="displayDiterimaSupir">Rp 0</div>
             </div>
-            <div class="result-item result-final" id="diterimaPekerjaItem" style="display: none;">
-                <span class="result-label">Yang Diterima Pekerja:</span>
-                <span class="result-value" id="displayDiterimaPekerja">Rp 0</span>
+            <div class="result-final" id="diterimaPekerjaItem" style="display: none;">
+                <div class="result-label" id="labelPekerja">Yang Diterima Pekerja:</div>
+                <div class="result-value" id="displayDiterimaPekerja">Rp 0</div>
+            </div>
+            <div class="result-final" id="diterimaPekerja2Item" style="display: none;">
+                <div class="result-label">Yang Diterima Pekerja 2:</div>
+                <div class="result-value" id="displayDiterimaPekerja2">Rp 0</div>
             </div>
         </div>
     </div>
@@ -368,6 +378,8 @@
             // Tampilkan muat bongkar jika ada
             const muatBongkarItem = document.getElementById('muatBongkarItem');
             const diterimaPekerjaItem = document.getElementById('diterimaPekerjaItem');
+            const diterimaPekerja2Item = document.getElementById('diterimaPekerja2Item');
+            const labelPekerja = document.getElementById('labelPekerja');
             
             if (biayaMuatBongkar > 0) {
                 muatBongkarItem.style.display = 'flex';
@@ -375,12 +387,25 @@
                 document.getElementById('displayMuatBongkar').textContent = formatRupiah(biayaMuatBongkar) + keterangan;
                 
                 // Tampilkan yang diterima pekerja
-                diterimaPekerjaItem.style.display = 'flex';
-                const keteranganPekerja = jumlahPekerja === 1 ? ' (1 Orang)' : ' (2 Orang @ ' + formatRupiah(diterimaPekerja / 2) + ')';
-                document.getElementById('displayDiterimaPekerja').textContent = formatRupiah(diterimaPekerja) + keteranganPekerja;
+                if (jumlahPekerja === 1) {
+                    // 1 orang pekerja
+                    diterimaPekerjaItem.style.display = 'flex';
+                    diterimaPekerja2Item.style.display = 'none';
+                    labelPekerja.textContent = 'Yang Diterima Pekerja:';
+                    document.getElementById('displayDiterimaPekerja').textContent = formatRupiah(diterimaPekerja);
+                } else {
+                    // 2 orang pekerja
+                    const perPekerja = diterimaPekerja / 2;
+                    diterimaPekerjaItem.style.display = 'flex';
+                    diterimaPekerja2Item.style.display = 'flex';
+                    labelPekerja.textContent = 'Yang Diterima Pekerja 1:';
+                    document.getElementById('displayDiterimaPekerja').textContent = formatRupiah(perPekerja);
+                    document.getElementById('displayDiterimaPekerja2').textContent = formatRupiah(perPekerja);
+                }
             } else {
                 muatBongkarItem.style.display = 'none';
                 diterimaPekerjaItem.style.display = 'none';
+                diterimaPekerja2Item.style.display = 'none';
             }
 
             document.getElementById('displayTotal').textContent = formatRupiah(totalOrderan);
