@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InhilCargo - Kalkulator Potongan Admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .logo h1 {
+            color: #667eea;
+            font-size: 36px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .logo p {
+            color: #666;
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #2c3e50;
+            font-weight: 700;
+            font-size: 15px;
+            letter-spacing: -0.2px;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c3e50;
+            transition: all 0.3s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .btn-calculate:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-calculate:active {
+            transform: translateY(0);
+        }
+
+        .result {
+            margin-top: 30px;
+            padding: 30px;
+            background: #ffffff;
+            border-radius: 15px;
+            border: 3px solid #667eea;
+            display: none;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .result.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9ff;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .result-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .result-label {
+            color: #555;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: -0.1px;
+        }
+
+        .result-value {
+            color: #1a1a2e;
+            font-weight: 700;
+            font-size: 18px;
+            letter-spacing: -0.3px;
+        }
+
+        .result-final {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border: none;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .result-final .result-label {
+            color: #ffffff;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 0px;
+        }
+
+        .result-final .result-value {
+            color: #ffffff;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .currency {
+            font-size: 14px;
+            color: #999;
+        }
+
+        .error {
+            color: #e74c3c;
+            font-size: 12px;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .error.show {
+            display: block;
+        }
+
+        .info-text {
+            color: #667eea;
+            font-size: 13px;
+            margin-top: 8px;
+            font-weight: 600;
+            letter-spacing: -0.1px;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 25px;
+            }
+
+            .logo h1 {
+                font-size: 26px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <h1>🚚 InhilCargo</h1>
+            <p>Kalkulator Potongan Admin Supir</p>
+        </div>
+
+        <div>
+            <div class="form-group">
+                <label for="jenisAngkutan">Jenis Armada</label>
+                <select id="jenisAngkutan">
+                    <option value="">Pilih Jenis Armada</option>
+                    <option value="PICKUP">PICKUP</option>
+                    <option value="VIAR">VIAR</option>
+                    <option value="GEROBAK MOTOR">GEROBAK MOTOR</option>
+                    <option value="COLT DIESEL">COLT DIESEL</option>
+                </select>
+                <div id="errorJenis" class="error">Mohon pilih jenis armada</div>
+            </div>
+
+            <div class="form-group">
+                <label for="nominal">Nominal Orderan <span class="currency">(Rp)</span></label>
+                <input 
+                    type="text" 
+                    id="nominal" 
+                    placeholder="Contoh: 1000000"
+                >
+                <div id="errorNominal" class="error">Mohon masukkan nominal yang valid</div>
+            </div>
+
+            <div class="form-group">
+                <label for="muatBongkar">Jumlah Pekerja Muat & Bongkar</label>
+                <select id="muatBongkar">
+                    <option value="0">Tidak Ada (Pelanggan Sendiri)</option>
+                    <option value="1">1 Orang (Rp 50.000) - Pelanggan Ikut Bantu</option>
+                    <option value="2">2 Orang (Rp 100.000) - Terima Beres</option>
+                </select>
+                <div class="info-text">💡 Potongan admin 20% berlaku untuk muat bongkar juga</div>
+            </div>
+
+            <button type="button" class="btn-calculate" onclick="hitungPotongan()">Hitung Potongan</button>
+        </div>
+
+        <div id="result" class="result">
+            <div class="result-item">
+                <span class="result-label">Jenis Armada:</span>
+                <span class="result-value" id="displayJenis">-</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Nominal Orderan:</span>
+                <span class="result-value" id="displayNominal">Rp 0</span>
+            </div>
+            <div class="result-item" id="muatBongkarItem" style="display: none;">
+                <span class="result-label">Muat & Bongkar:</span>
+                <span class="result-value" id="displayMuatBongkar">Rp 0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Total Orderan:</span>
+                <span class="result-value" id="displayTotal">Rp 0</span>
+            </div>
+            <div class="result-item">
+                <span class="result-label">Potongan Admin (20%):</span>
+                <span class="result-value" id="displayPotongan">Rp 0</span>
+            </div>
+            <div class="result-item result-final">
+                <span class="result-label">Yang Diterima Supir:</span>
+                <span class="result-value" id="displayDiterimaSupir">Rp 0</span>
+            </div>
+            <div class="result-item result-final" id="diterimaPekerjaItem" style="display: none;">
+                <span class="result-label">Yang Diterima Pekerja:</span>
+                <span class="result-value" id="displayDiterimaPekerja">Rp 0</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const nominalInput = document.getElementById('nominal');
+        const jenisAngkutanSelect = document.getElementById('jenisAngkutan');
+        const muatBongkarSelect = document.getElementById('muatBongkar');
+        const resultDiv = document.getElementById('result');
+        const errorJenis = document.getElementById('errorJenis');
+        const errorNominal = document.getElementById('errorNominal');
+
+        // Format angka menjadi Rupiah
+        function formatRupiah(angka) {
+            return 'Rp ' + angka.toLocaleString('id-ID');
+        }
+
+        // Format input saat mengetik
+        nominalInput.addEventListener('input', function(e) {
+            let value = e.target.value.replace(/[^0-9]/g, '');
+            e.target.value = value;
+            errorNominal.classList.remove('show');
+        });
+
+        jenisAngkutanSelect.addEventListener('change', function() {
+            errorJenis.classList.remove('show');
+        });
+
+        // Fungsi hitung potongan
+        function hitungPotongan() {
+            const jenisAngkutan = jenisAngkutanSelect.value;
+            const nominal = parseInt(nominalInput.value) || 0;
+            const jumlahPekerja = parseInt(muatBongkarSelect.value);
+
+            let isValid = true;
+
+            // Validasi jenis angkutan
+            if (!jenisAngkutan) {
+                errorJenis.classList.add('show');
+                isValid = false;
+            } else {
+                errorJenis.classList.remove('show');
+            }
+
+            // Validasi nominal
+            if (nominal <= 0) {
+                errorNominal.classList.add('show');
+                isValid = false;
+            } else {
+                errorNominal.classList.remove('show');
+            }
+
+            if (!isValid) return;
+
+            // Hitung biaya muat bongkar
+            const biayaMuatBongkar = jumlahPekerja * 50000;
+            const totalOrderan = nominal + biayaMuatBongkar;
+
+            // Hitung potongan 20% dari total
+            const potongan = totalOrderan * 0.20;
+            
+            // Pisahkan pendapatan supir dan pekerja
+            const potonganOrderan = nominal * 0.20;
+            const diterimaSupir = nominal - potonganOrderan;
+            
+            const potonganMuatBongkar = biayaMuatBongkar * 0.20;
+            const diterimaPekerja = biayaMuatBongkar - potonganMuatBongkar;
+
+            // Tampilkan hasil
+            document.getElementById('displayJenis').textContent = jenisAngkutan;
+            document.getElementById('displayNominal').textContent = formatRupiah(nominal);
+            
+            // Tampilkan muat bongkar jika ada
+            const muatBongkarItem = document.getElementById('muatBongkarItem');
+            const diterimaPekerjaItem = document.getElementById('diterimaPekerjaItem');
+            
+            if (biayaMuatBongkar > 0) {
+                muatBongkarItem.style.display = 'flex';
+                const keterangan = jumlahPekerja === 1 ? ' (Pelanggan Ikut Bantu)' : ' (Terima Beres)';
+                document.getElementById('displayMuatBongkar').textContent = formatRupiah(biayaMuatBongkar) + keterangan;
+                
+                // Tampilkan yang diterima pekerja
+                diterimaPekerjaItem.style.display = 'flex';
+                const keteranganPekerja = jumlahPekerja === 1 ? ' (1 Orang)' : ' (2 Orang @ ' + formatRupiah(diterimaPekerja / 2) + ')';
+                document.getElementById('displayDiterimaPekerja').textContent = formatRupiah(diterimaPekerja) + keteranganPekerja;
+            } else {
+                muatBongkarItem.style.display = 'none';
+                diterimaPekerjaItem.style.display = 'none';
+            }
+
+            document.getElementById('displayTotal').textContent = formatRupiah(totalOrderan);
+            document.getElementById('displayPotongan').textContent = formatRupiah(potongan);
+            document.getElementById('displayDiterimaSupir').textContent = formatRupiah(diterimaSupir);
+
+            // Tampilkan result box
+            resultDiv.classList.add('show');
+
+            // Scroll ke hasil
+            setTimeout(() => {
+                resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
+        }
+
+        // Allow Enter key to submit
+        nominalInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                hitungPotongan();
+            }
+        });
+    </script>
+</body>
+</html>
