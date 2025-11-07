@@ -250,11 +250,7 @@
 
             <div class="form-group">
                 <label for="nominal">Nominal Orderan <span class="currency">(Rp)</span></label>
-                <input 
-                    type="text" 
-                    id="nominal" 
-                    placeholder="Contoh: 1000000"
-                >
+                <input type="text" id="nominal" placeholder="Contoh: 1000000">
                 <div id="errorNominal" class="error">Mohon masukkan nominal yang valid</div>
             </div>
 
@@ -292,6 +288,12 @@
                 <span class="result-label">Potongan Admin (20%):</span>
                 <span class="result-value" id="displayPotongan">Rp 0</span>
             </div>
+
+            <!-- Tombol Bayar -->
+            <div id="btnBayarContainer" style="display:none; text-align:center; margin-top:15px;">
+                <button class="btn-calculate" onclick="bukaQRIS()">BAYAR ADMIN DISINI!</button>
+            </div>
+
             <div class="result-final">
                 <div class="result-label">Yang Diterima Supir:</div>
                 <div class="result-value" id="displayDiterimaSupir">Rp 0</div>
@@ -307,6 +309,40 @@
         </div>
     </div>
 
+    <!-- Popup QRIS -->
+    <div id="popupQRIS" style="
+        display:none;
+        position:fixed;
+        top:0; left:0;
+        width:100%; height:100%;
+        background:rgba(0,0,0,0.7);
+        justify-content:center;
+        align-items:center;
+        z-index:999;
+    ">
+        <div style="
+            background:white;
+            padding:20px;
+            border-radius:15px;
+            text-align:center;
+            max-width:400px;
+            width:90%;
+        ">
+            <img src="qris.png" alt="QRIS Pembayaran" style="width:100%; border-radius:10px;">
+            <p style="margin-top:15px; font-weight:600; color:#333;">Scan QRIS untuk melakukan pembayaran</p>
+            <button onclick="tutupQRIS()" style="
+                margin-top:15px;
+                background:#667eea;
+                color:white;
+                padding:10px 20px;
+                border:none;
+                border-radius:8px;
+                cursor:pointer;
+                font-weight:600;
+            ">Tutup</button>
+        </div>
+    </div>
+
     <script>
         const nominalInput = document.getElementById('nominal');
         const jenisAngkutanSelect = document.getElementById('jenisAngkutan');
@@ -315,12 +351,10 @@
         const errorJenis = document.getElementById('errorJenis');
         const errorNominal = document.getElementById('errorNominal');
 
-        // Format angka menjadi Rupiah
         function formatRupiah(angka) {
             return 'Rp ' + angka.toLocaleString('id-ID');
         }
 
-        // Format input saat mengetik
         nominalInput.addEventListener('input', function(e) {
             let value = e.target.value.replace(/[^0-9]/g, '');
             e.target.value = value;
@@ -331,70 +365,50 @@
             errorJenis.classList.remove('show');
         });
 
-        // Fungsi hitung potongan
         function hitungPotongan() {
             const jenisAngkutan = jenisAngkutanSelect.value;
             const nominal = parseInt(nominalInput.value) || 0;
             const jumlahPekerja = parseInt(muatBongkarSelect.value);
-
             let isValid = true;
 
-            // Validasi jenis angkutan
             if (!jenisAngkutan) {
                 errorJenis.classList.add('show');
                 isValid = false;
-            } else {
-                errorJenis.classList.remove('show');
             }
-
-            // Validasi nominal
             if (nominal <= 0) {
                 errorNominal.classList.add('show');
                 isValid = false;
-            } else {
-                errorNominal.classList.remove('show');
             }
-
             if (!isValid) return;
 
-            // Hitung biaya muat bongkar
             const biayaMuatBongkar = jumlahPekerja * 50000;
             const totalOrderan = nominal + biayaMuatBongkar;
-
-            // Hitung potongan 20% dari total
             const potongan = totalOrderan * 0.20;
-            
-            // Pisahkan pendapatan supir dan pekerja
-            const potonganOrderan = nominal * 0.20;
-            const diterimaSupir = nominal - potonganOrderan;
-            
-            const potonganMuatBongkar = biayaMuatBongkar * 0.20;
-            const diterimaPekerja = biayaMuatBongkar - potonganMuatBongkar;
+            const diterimaSupir = nominal - (nominal * 0.20);
+            const diterimaPekerja = biayaMuatBongkar - (biayaMuatBongkar * 0.20);
 
-            // Tampilkan hasil
             document.getElementById('displayJenis').textContent = jenisAngkutan;
             document.getElementById('displayNominal').textContent = formatRupiah(nominal);
-            
-            // Tampilkan muat bongkar jika ada
+            document.getElementById('displayTotal').textContent = formatRupiah(totalOrderan);
+            document.getElementById('displayPotongan').textContent = formatRupiah(potongan);
+            document.getElementById('displayDiterimaSupir').textContent = formatRupiah(diterimaSupir);
+
             const muatBongkarItem = document.getElementById('muatBongkarItem');
             const diterimaPekerjaItem = document.getElementById('diterimaPekerjaItem');
             const diterimaPekerja2Item = document.getElementById('diterimaPekerja2Item');
             const labelPekerja = document.getElementById('labelPekerja');
-            
+
             if (biayaMuatBongkar > 0) {
                 muatBongkarItem.style.display = 'flex';
                 const keterangan = jumlahPekerja === 1 ? ' (Pelanggan Ikut Bantu)' : ' (Terima Beres)';
                 document.getElementById('displayMuatBongkar').textContent = formatRupiah(biayaMuatBongkar) + keterangan;
-                
-                // Tampilkan yang diterima pekerja
+
                 if (jumlahPekerja === 1) {
-                    // 1 orang pekerja
                     diterimaPekerjaItem.style.display = 'flex';
                     diterimaPekerja2Item.style.display = 'none';
                     labelPekerja.textContent = 'Yang Diterima Pekerja:';
                     document.getElementById('displayDiterimaPekerja').textContent = formatRupiah(diterimaPekerja);
                 } else {
-                    // 2 orang pekerja
                     const perPekerja = diterimaPekerja / 2;
                     diterimaPekerjaItem.style.display = 'flex';
                     diterimaPekerja2Item.style.display = 'flex';
@@ -408,25 +422,20 @@
                 diterimaPekerja2Item.style.display = 'none';
             }
 
-            document.getElementById('displayTotal').textContent = formatRupiah(totalOrderan);
-            document.getElementById('displayPotongan').textContent = formatRupiah(potongan);
-            document.getElementById('displayDiterimaSupir').textContent = formatRupiah(diterimaSupir);
-
-            // Tampilkan result box
             resultDiv.classList.add('show');
+            document.getElementById('btnBayarContainer').style.display = 'block';
 
-            // Scroll ke hasil
             setTimeout(() => {
                 resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
             }, 100);
         }
 
-        // Allow Enter key to submit
-        nominalInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                hitungPotongan();
-            }
-        });
+        function bukaQRIS() {
+            document.getElementById('popupQRIS').style.display = 'flex';
+        }
+        function tutupQRIS() {
+            document.getElementById('popupQRIS').style.display = 'none';
+        }
     </script>
 </body>
 </html>
