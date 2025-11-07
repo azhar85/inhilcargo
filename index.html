@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InhilCargo - Kalkulator Potongan Admin</title>
+    <title>INHILCARGO - KALKULATOR POTONGAN ADMIN</title>
     <style>
         * {
             margin: 0;
@@ -330,6 +330,8 @@
         ">
             <img src="qris.png" alt="QRIS Pembayaran" style="width:100%; border-radius:10px;">
             <p style="margin-top:15px; font-weight:600; color:#333;">Scan QRIS untuk melakukan pembayaran</p>
+            <!-- ✅ Tambahan konfirmasi biaya admin -->
+            <p id="konfirmasiBiaya" style="margin-top:10px; font-size:15px; color:#555; font-weight:600;"></p>
             <button onclick="tutupQRIS()" style="
                 margin-top:15px;
                 background:#667eea;
@@ -350,6 +352,7 @@
         const resultDiv = document.getElementById('result');
         const errorJenis = document.getElementById('errorJenis');
         const errorNominal = document.getElementById('errorNominal');
+        let potonganTerakhir = 0; // ✅ variabel tambahan untuk menyimpan potongan admin
 
         function formatRupiah(angka) {
             return 'Rp ' + angka.toLocaleString('id-ID');
@@ -384,6 +387,7 @@
             const biayaMuatBongkar = jumlahPekerja * 50000;
             const totalOrderan = nominal + biayaMuatBongkar;
             const potongan = totalOrderan * 0.20;
+            potonganTerakhir = potongan; // ✅ simpan nilai potongan terakhir
             const diterimaSupir = nominal - (nominal * 0.20);
             const diterimaPekerja = biayaMuatBongkar - (biayaMuatBongkar * 0.20);
 
@@ -431,8 +435,11 @@
         }
 
         function bukaQRIS() {
+            document.getElementById('konfirmasiBiaya').textContent = 
+                "💰 Biaya admin yang harus dibayarkan: " + formatRupiah(potonganTerakhir);
             document.getElementById('popupQRIS').style.display = 'flex';
         }
+
         function tutupQRIS() {
             document.getElementById('popupQRIS').style.display = 'none';
         }
